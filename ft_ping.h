@@ -16,11 +16,16 @@
 #include <sys/types.h>
 #include <netdb.h>
 #include <arpa/inet.h>
+#include <time.h>
+#include <unistd.h>
 
 #include "libft/libft.h"
 
 
-/* This will be how I process my flags for now. 
+#define PING_SLEEP_RATE 1000
+
+/* 
+ * This will be how I process my flags for now. 
  * I am using bitfields cause I only need true or false
  * values for each flag.
  *
@@ -34,10 +39,5 @@ typedef struct {
 
 void usage(char *name);
 int set_flags(char *in, FT_FLAGS flags);
-
-
-struct sockaddr_in *dest_info(char *host, addrinfo *hints);
-void ping(int sockfd, struct sockaddr_in *destination_info`);
-
 
 #endif
