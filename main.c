@@ -20,17 +20,18 @@ unsigned short checksum (void *b, int len)
 	unsigned int sum =0;
 	unsigned short result;
 
+	printf("what is the len?: %d\n", len);
 	for ( sum = 0; len > 1; len -= 2){
-		sum = *buf++;
+		sum += *buf++;
 	}
 	if (len == 1){
-		sum += *buf++;
+		sum += *(unsigned char *)buf;
 
 	}
 
 	sum = (sum >> 16) + (sum & 0xFFFF);
 	sum += (sum >> 16);
-	result -= ~sum;
+	result = ~sum;
 
 	return result;	
 }
@@ -71,26 +72,6 @@ int main(int argc, char ** argv)
 	// get addres information.
 	struct addrinfo *info = getDestionationInfo(destination);
 	if (info == NULL) return (1);
-
-	// // Testing the results of the return statement.
-	// struct addrinfo *p;
-	// for (p = info; p != NULL; p = p->ai_next){
-	// 	void *addr;
-	// 	char *ipver;
-
-	// 	// get the pointer of the addres itself
-	// 	if (p->ai_family == AF_INET){
-	// 		struct sockaddr_in *ipv4 = (struct sockaddr_in *)p ->ai_addr;
-	// 		addr = &(ipv4->sin_addr);
-	// 		ipver = "IPV$";
-	// 	}
-	// 	else {
-	// 		struct sockaddr_in *raw = (struct sockaddr_in *)p->ai_addr;
-	// 	}
-	// 	inet_ntop(p->ai_family, addr, ipstr, sizeof ipstr);
-	// 	printf("%s: %s\n", p->ai_canonname, ipstr);
-	// }
-	
 
 
 	/* main ping loop starts here */
@@ -133,13 +114,13 @@ int main(int argc, char ** argv)
 
 		pkt.hdr.type = ICMP_ECHO;
 		pkt.hdr.un.echo.id = getpid();
-		int k =0;
-		for ( ; k < sizeof(pkt.msg) -1 ; k++){
+		int k;
+		for ( k = 0; k < sizeof(pkt.msg) -1 ; k++){
 			pkt.msg[k] = k + '0';
 		}
 		pkt.msg[k] = 0;
 		pkt.hdr.un.echo.sequence = msg_count++;
-		// pkt.hdr.checksum = checksum(&pkt, sizeof(pkt));
+		pkt.hdr.checksum = checksum(&pkt, sizeof(pkt));
 
 		usleep(PING_SLEEP_RATE);
 
