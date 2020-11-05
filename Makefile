@@ -5,7 +5,7 @@ NAME = ft_ping
 all: $(NAME)
 
 $(NAME):
-	gcc main.c utils/* libft/libft.a -o $(NAME)
+	gcc *.c utils/* libft/libft.a -o $(NAME)
 
 clean:
 	@rm -f $(OBJ)

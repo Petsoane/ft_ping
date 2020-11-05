@@ -2,39 +2,11 @@
  * Recreating the ping command.
  */
 #include "ft_ping.h"
-#include <netdb.h>
-#include <netinet/in.h>
-#include <netinet/ip_icmp.h>
-#include <stdio.h>
-#include <sys/socket.h>
+#include "libft/libft.h"
 
 struct addrinfo *getDestionationInfo(char *node);
-	struct ping_pkt{
-		struct icmphdr hdr;
-		char msg[64 - sizeof(struct icmphdr)];
-	};
+int pingloop = 1;
 
-unsigned short checksum (void *b, int len)
-{
-	unsigned short *buf = b;
-	unsigned int sum =0;
-	unsigned short result;
-
-	printf("what is the len?: %d\n", len);
-	for ( sum = 0; len > 1; len -= 2){
-		sum += *buf++;
-	}
-	if (len == 1){
-		sum += *(unsigned char *)buf;
-
-	}
-
-	sum = (sum >> 16) + (sum & 0xFFFF);
-	sum += (sum >> 16);
-	result = ~sum;
-
-	return result;	
-}
 
 int main(int argc, char ** argv)
 {
@@ -43,30 +15,13 @@ int main(int argc, char ** argv)
 	FT_FLAGS 		MY_FLAGS;
 	char			ipstr[INET6_ADDRSTRLEN];
 
+
 	struct ping_pkt	pkt;
 
-	// get the flags.
-	int i = 1;
-	char *tmp;
-	for ( ; i < argc; i++){
-		tmp = ft_strtrim(argv[i]);
-
-		if (tmp[0] == '-' ){
-			
-			if (set_flags(tmp, MY_FLAGS) == -1){
-				puts("Invalid parameter.");
-				return (1);
-			}
-		}
+	// init program start.
+	if (init(argc, argv, &MY_FLAGS, &destination) != 0){
+		return (2);
 	}
-
-	// Check the arguments.
-	if (argc - i -1  == 0){
-		usage(argv[0]);
-		return (1);
-	}
-
-	destination = ft_strdup(tmp);
 
 
 	// get addres information.
@@ -90,6 +45,7 @@ int main(int argc, char ** argv)
 		return 1;
 	}
 
+
 	// set timout for recv function
 	struct timeval time_out;
 	int RECV_TIMEOUT = 1;
@@ -103,63 +59,9 @@ int main(int argc, char ** argv)
 		return (1);
 	}
 
-	
 
-
-	int msg_count = 0, flag =1;
-	for (int i = 0; i < 1000; i++){
-		flag = 1;
-		// fill icmp packet
-		bzero(&pkt, sizeof(pkt));
-
-		pkt.hdr.type = ICMP_ECHO;
-		pkt.hdr.un.echo.id = getpid();
-		int k;
-		for ( k = 0; k < sizeof(pkt.msg) -1 ; k++){
-			pkt.msg[k] = k + '0';
-		}
-		pkt.msg[k] = 0;
-		pkt.hdr.un.echo.sequence = msg_count++;
-		pkt.hdr.checksum = checksum(&pkt, sizeof(pkt));
-
-		usleep(PING_SLEEP_RATE);
-
-		// send the packet
-		struct sockaddr *tmp = info->ai_addr;
-		sstatus = sendto(sockfd, &pkt, sizeof(pkt), 0, (struct sockaddr *)tmp, sizeof(*tmp));
-		if (sstatus <= 0){
-			fprintf(stderr, "\nPacket sending failed: %d - %s \n", sstatus, gai_strerror(sstatus));
-			flag = 0;
-		}
-
-		// reciev packet
-		struct sockaddr_in r_addr;
-		int addr_len = sizeof(r_addr);
-
-		sstatus = recvfrom(sockfd, &pkt, sizeof(pkt), 0, (struct sockaddr *)&r_addr, &addr_len);
-		if (sstatus <=0 && msg_count > 1){
-			printf("\nPacket reciev failed");
-		}
-		else {
-			if (flag){
-				if (!(pkt.hdr.type == 69 && pkt.hdr.code == 0)){
-					printf("Error... packet recieved with ICMP type %d, code %d \n", pkt.hdr.type, pkt.hdr.code);
-				}
-				else{
-					printf("ping recieved\n");
-				}
-			}
-		}
-
-
-	}
-		printf("Done with the piniging");
-
-
-	// awit for response
-
-	// fill the icmp echo
-
+	ping(sockfd, info, &pingloop);
+	printf("Done with the piniging");
 
 	return (0);
 

@@ -37,7 +37,19 @@ typedef struct {
 	int 			v;
 } 					FT_FLAGS;
 
+struct ping_pkt{
+	struct icmphdr hdr;
+	char msg[64 - sizeof(struct icmphdr)];
+};
+
+
+// Utility functions
 void usage(char *name);
 int set_flags(char *in, FT_FLAGS flags);
 
+// Core functions
+unsigned short checksum (void *b, int len);
+int init(int argc, char **argv, FT_FLAGS *flags, char **destination);
+
+void ping(int sockfd, struct addrinfo *info, int *pingloop);
 #endif
