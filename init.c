@@ -1,7 +1,7 @@
 #include "ft_ping.h"
 
 
-int init(int argc, char **argv, FT_FLAGS *flags, char **dest)
+int init(int argc, char **argv, FT_FLAGS *flags, t_destination *dest)
 {
     int i = 1;
     char *tmp;
@@ -29,8 +29,15 @@ int init(int argc, char **argv, FT_FLAGS *flags, char **dest)
         return (-1);
     }
 
-    *dest = ft_strdup(out);
+    dest->ping_dest = ft_strdup(out);
     free(out);
+
+   	// get addres information.
+	if (get_dest_info(dest) != 0) return (-1);
+
+    struct sockaddr_in *ipv4 = (struct sockaddr_in *)dest->info->ai_addr;
+    void *addr = &(ipv4->sin_addr);
+    inet_ntop(dest->info->ai_family, addr, dest->ipstr, sizeof(dest->ipstr));
 
     return 0;
 }

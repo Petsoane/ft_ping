@@ -6,7 +6,6 @@ unsigned short checksum (void *b, int len)
 	unsigned int sum =0;
 	unsigned short result;
 
-	printf("what is the len?: %d\n", len);
 	for ( sum = 0; len > 1; len -= 2){
 		sum += *buf++;
 	}

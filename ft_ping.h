@@ -42,14 +42,22 @@ struct ping_pkt{
 	char msg[64 - sizeof(struct icmphdr)];
 };
 
+typedef struct s_d {
+	char *ping_dest;
+	struct addrinfo *info;
+	char ipstr[INET6_ADDRSTRLEN];
+}              t_destination;
+
 
 // Utility functions
 void usage(char *name);
 int set_flags(char *in, FT_FLAGS flags);
+int get_dest_info(t_destination *node);
+
 
 // Core functions
 unsigned short checksum (void *b, int len);
-int init(int argc, char **argv, FT_FLAGS *flags, char **destination);
+int init(int argc, char **argv, FT_FLAGS *flags, t_destination *destination);
 
-void ping(int sockfd, struct addrinfo *info, int *pingloop);
+void ping(int sockfd, t_destination dest, int *pingloop);
 #endif

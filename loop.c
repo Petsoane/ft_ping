@@ -1,13 +1,13 @@
 #include "ft_ping.h"
-#include <netdb.h>
 
-void ping(int sockfd, struct addrinfo *info, int *pingloop)
+void ping(int sockfd, t_destination dest, int *pingloop)
 {
     int msg_count = 0;
     int flag = 1;
     int k;
     int sstatus;
     int addr_len;
+    struct timespec start, end;
 
     struct ping_pkt pkt;
 
@@ -29,8 +29,8 @@ void ping(int sockfd, struct addrinfo *info, int *pingloop)
         usleep(PING_SLEEP_RATE);
 
         // send the packet
-
-        struct sockaddr *tmp = info->ai_addr;
+        clock_gettime(CLOCK_MONOTONIC, &start);
+        struct sockaddr *tmp = dest.info->ai_addr;
         sstatus = sendto(sockfd, &pkt, sizeof(pkt), 0, tmp, sizeof(*tmp));
         if (sstatus <= 0){
             fprintf(stderr, "\nPacket sending failed: %d - %s \n", sstatus, gai_strerror(sstatus));
@@ -46,13 +46,19 @@ void ping(int sockfd, struct addrinfo *info, int *pingloop)
             printf("\n Packet recieve failed");
         }
         else{
+            clock_gettime(CLOCK_MONOTONIC, &end);
+
+            double timeElapsed = ((double)(end.tv_nsec - start.tv_nsec))/1000000.0;
+            long double rtt_msec = (end.tv_sec -start.tv_sec) * 1000.0 + timeElapsed;
+
             if (flag){
                 if (!(pkt.hdr.type == 69 && pkt.hdr.code == 0)){
                     printf("Error... packet recieved with ICMP type %d, code %d\n",
                     pkt.hdr.type, pkt.hdr.code);
                 }
                 else {
-                    printf("ping recieved");
+                    printf("%d bytes from %s (h: %s): mesg_seq=%d ttl=%d rtt=%Lf ms.\n",
+                                64, dest.info->ai_canonname, dest.ipstr, msg_count, 64, rtt_msec);
                 }
             }
         }

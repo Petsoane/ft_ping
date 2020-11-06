@@ -4,16 +4,23 @@
 #include "ft_ping.h"
 #include "libft/libft.h"
 
-struct addrinfo *getDestionationInfo(char *node);
 int pingloop = 1;
 
+void intHandler(int dummy){
+	pingloop = 0;
+}
 
 int main(int argc, char ** argv)
 {
-	char 			*destination;
+	t_destination 	destination;
 	int 			param_count;
 	FT_FLAGS 		MY_FLAGS;
 	char			ipstr[INET6_ADDRSTRLEN];
+	struct			timespec time_from_start, time_from_end;
+
+
+
+
 
 
 	struct ping_pkt	pkt;
@@ -22,12 +29,6 @@ int main(int argc, char ** argv)
 	if (init(argc, argv, &MY_FLAGS, &destination) != 0){
 		return (2);
 	}
-
-
-	// get addres information.
-	struct addrinfo *info = getDestionationInfo(destination);
-	if (info == NULL) return (1);
-
 
 	/* main ping loop starts here */
 	// open a raw socket connection.
@@ -60,30 +61,26 @@ int main(int argc, char ** argv)
 	}
 
 
-	ping(sockfd, info, &pingloop);
+	signal(SIGINT, intHandler);
+
+	clock_gettime(CLOCK_MONOTONIC, &time_from_start);
+	ping(sockfd, destination, &pingloop);
+	clock_gettime(CLOCK_MONOTONIC, &time_from_end);
+	
+	// calculate the time it took to run the ping.
+	double timeElapsed = ((double)(time_from_end.tv_nsec 
+							- time_from_start.tv_nsec)) / 1000000.0;
+
+	double total_msec = 0;
+	total_msec = (time_from_end.tv_sec - time_from_start.tv_sec) * 1000.0 + timeElapsed;
+	printf("\n ===%s ping statistics===\n", destination.info->ai_canonname);
+	printf("\n%d packets sent, %d packets received, %f percent packet loss. Total time: %Lf ms.\nn",
+				10, 10, 10);
+
+
 	printf("Done with the piniging");
 
 	return (0);
 
 }
 
-struct addrinfo *getDestionationInfo(char *node)
-{
-	int status;
-	struct addrinfo hints;
-	struct addrinfo *destInfo;
-
-	memset(&hints, 0, sizeof hints);
-	hints.ai_family  = AF_INET;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_flags = AI_CANONNAME;
-
-	status = getaddrinfo(node, "0", &hints, &destInfo);
-
-	if (status != 0){
-		fprintf(stderr, "ft_ping: %s: %s\n",node, gai_strerror(status));
-		return NULL;
-	}
-
-	return destInfo;
-}
