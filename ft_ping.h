@@ -48,6 +48,10 @@ typedef struct s_d {
 	char ipstr[INET6_ADDRSTRLEN];
 }              t_destination;
 
+typedef struct s_pms {
+	int total_sent;
+	int received;
+} t_msg;
 
 // Utility functions
 void usage(char *name);
@@ -59,5 +63,5 @@ int get_dest_info(t_destination *node);
 unsigned short checksum (void *b, int len);
 int init(int argc, char **argv, FT_FLAGS *flags, t_destination *destination);
 
-void ping(int sockfd, t_destination dest, int *pingloop);
+void ping(int sockfd, t_destination dest, int *pingloop, t_msg *msg);
 #endif

@@ -1,8 +1,8 @@
 #include "ft_ping.h"
 
-void ping(int sockfd, t_destination dest, int *pingloop)
+void ping(int sockfd, t_destination dest, int *pingloop, t_msg *msg)
 {
-    int msg_count = 0;
+    int msg_count = 0, msg_recv = 0;
     int flag = 1;
     int k;
     int sstatus;
@@ -43,7 +43,7 @@ void ping(int sockfd, t_destination dest, int *pingloop)
 
         sstatus = recvfrom(sockfd, &pkt, sizeof(pkt), 0, (struct sockaddr *)&r_addr, &addr_len);
         if (sstatus <= 0 && msg_count > 1){
-            printf("\n Packet recieve failed");
+            // printf("\n Packet recieve failed");
         }
         else{
             clock_gettime(CLOCK_MONOTONIC, &end);
@@ -59,8 +59,12 @@ void ping(int sockfd, t_destination dest, int *pingloop)
                 else {
                     printf("%d bytes from %s (h: %s): mesg_seq=%d ttl=%d rtt=%Lf ms.\n",
                                 64, dest.info->ai_canonname, dest.ipstr, msg_count, 64, rtt_msec);
+                    msg_recv++;
                 }
             }
         }
     }
+
+    msg->total_sent = msg_count;
+    msg->received = msg_recv;
 }

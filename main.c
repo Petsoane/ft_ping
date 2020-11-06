@@ -19,10 +19,6 @@ int main(int argc, char ** argv)
 	struct			timespec time_from_start, time_from_end;
 
 
-
-
-
-
 	struct ping_pkt	pkt;
 
 	// init program start.
@@ -63,10 +59,13 @@ int main(int argc, char ** argv)
 
 	signal(SIGINT, intHandler);
 
+	t_msg msg;
+
 	clock_gettime(CLOCK_MONOTONIC, &time_from_start);
-	ping(sockfd, destination, &pingloop);
+	ping(sockfd, destination, &pingloop, &msg);
 	clock_gettime(CLOCK_MONOTONIC, &time_from_end);
 	
+	msg.total_sent -= 1;
 	// calculate the time it took to run the ping.
 	double timeElapsed = ((double)(time_from_end.tv_nsec 
 							- time_from_start.tv_nsec)) / 1000000.0;
@@ -74,11 +73,10 @@ int main(int argc, char ** argv)
 	double total_msec = 0;
 	total_msec = (time_from_end.tv_sec - time_from_start.tv_sec) * 1000.0 + timeElapsed;
 	printf("\n ===%s ping statistics===\n", destination.info->ai_canonname);
-	printf("\n%d packets sent, %d packets received, %f percent packet loss. Total time: %Lf ms.\nn",
-				10, 10, 10);
+	printf("\n%d packets sent, %d packets received, %f percent packet loss. Total time: %f ms.\n\n",
+				msg.total_sent, msg.received, ((msg.total_sent - msg.received) / msg.total_sent)*100.0, total_msec);
 
 
-	printf("Done with the piniging");
 
 	return (0);
 
