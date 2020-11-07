@@ -12,15 +12,15 @@
 #include "../ft_ping.h"
 
 
-int set_flags(char *input_string, FT_FLAGS MY_FLAGS)
+int set_flags(char *input_string, FT_FLAGS *MY_FLAGS)
 {
 	int start_point = 1;
 	int status = 0;
 
 	while (input_string[start_point]){
 		switch(input_string[start_point]){
-			case 'h': MY_FLAGS.h = 1; break;
-			case 'v': MY_FLAGS.v = 1; break;
+			case 'h': MY_FLAGS->h = 1; break;
+			case 'v': MY_FLAGS->v = 1; break;
 			default:  status = -1; break;
 		}
 		start_point++;

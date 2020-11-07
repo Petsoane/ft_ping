@@ -22,7 +22,7 @@
 #include "libft/libft.h"
 
 
-#define PING_SLEEP_RATE 1000
+#define PING_SLEEP_RATE 1000000
 
 /* 
  * This will be how I process my flags for now. 
@@ -46,6 +46,7 @@ typedef struct s_d {
 	char *ping_dest;
 	struct addrinfo *info;
 	char ipstr[INET6_ADDRSTRLEN];
+	char *fqdn;
 }              t_destination;
 
 typedef struct s_pms {
@@ -55,13 +56,14 @@ typedef struct s_pms {
 
 // Utility functions
 void usage(char *name);
-int set_flags(char *in, FT_FLAGS flags);
+int set_flags(char *in, FT_FLAGS *flags);
 int get_dest_info(t_destination *node);
+void help();
 
 
 // Core functions
 unsigned short checksum (void *b, int len);
 int init(int argc, char **argv, FT_FLAGS *flags, t_destination *destination);
 
-void ping(int sockfd, t_destination dest, int *pingloop, t_msg *msg);
+void ping(int sockfd, t_destination dest, int *pingloop, t_msg *msg, FT_FLAGS *flags);
 #endif

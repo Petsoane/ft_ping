@@ -1,6 +1,6 @@
 #include "ft_ping.h"
 
-void ping(int sockfd, t_destination dest, int *pingloop, t_msg *msg)
+void ping(int sockfd, t_destination dest, int *pingloop, t_msg *msg, FT_FLAGS *flags)
 {
     int msg_count = 0, msg_recv = 0;
     int flag = 1;
@@ -10,6 +10,8 @@ void ping(int sockfd, t_destination dest, int *pingloop, t_msg *msg)
     struct timespec start, end;
 
     struct ping_pkt pkt;
+
+    printf("PING %s (%s) 64 bytes of data\n", dest.ping_dest, dest.ipstr);
 
     while (*pingloop){
         flag = 1;
@@ -33,7 +35,7 @@ void ping(int sockfd, t_destination dest, int *pingloop, t_msg *msg)
         struct sockaddr *tmp = dest.info->ai_addr;
         sstatus = sendto(sockfd, &pkt, sizeof(pkt), 0, tmp, sizeof(*tmp));
         if (sstatus <= 0){
-            fprintf(stderr, "\nPacket sending failed: %d - %s \n", sstatus, gai_strerror(sstatus));
+            // fprintf(stderr, "\nPacket sending failed: %d - %s \n", sstatus, gai_strerror(sstatus));
             flag = 0;
         }
 
@@ -53,12 +55,15 @@ void ping(int sockfd, t_destination dest, int *pingloop, t_msg *msg)
 
             if (flag){
                 if (!(pkt.hdr.type == 69 && pkt.hdr.code == 0)){
-                    printf("Error... packet recieved with ICMP type %d, code %d\n",
-                    pkt.hdr.type, pkt.hdr.code);
+                    // printf("Error... packet recieved with ICMP type %d, code %d\n",
+                    // pkt.hdr.type, pkt.hdr.code);
+                    if (flags->v ==1)
+                        printf("%d bytes from %s (%s): mesg_seq=%d ttl=%d rtt=%Lf ms.\n",
+                                64, dest.info->ai_canonname, dest.ipstr, msg_count, 64, rtt_msec);
                 }
                 else {
-                    printf("%d bytes from %s (h: %s): mesg_seq=%d ttl=%d rtt=%Lf ms.\n",
-                                64, dest.info->ai_canonname, dest.ipstr, msg_count, 64, rtt_msec);
+                    printf("%d bytes from %s (%s): icmp_seq=%d ttl=%d rtt=%f ms\n",
+                                64, dest.fqdn, dest.ipstr, msg_count, 64, rtt_msec);
                     msg_recv++;
                 }
             }

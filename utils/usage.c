@@ -7,5 +7,5 @@
 
 void usage(char *name)
 {
-	printf("%s [-v, -h] <IPADDR or HOSTNAME>", name);
+	printf("%s [options] <destination>", name);
 }

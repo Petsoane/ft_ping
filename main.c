@@ -14,16 +14,19 @@ int main(int argc, char ** argv)
 {
 	t_destination 	destination;
 	int 			param_count;
-	FT_FLAGS 		MY_FLAGS;
+	FT_FLAGS 		flags;
 	char			ipstr[INET6_ADDRSTRLEN];
 	struct			timespec time_from_start, time_from_end;
-
 
 	struct ping_pkt	pkt;
 
 	// init program start.
-	if (init(argc, argv, &MY_FLAGS, &destination) != 0){
+	if (init(argc, argv, &flags, &destination) != 0){
 		return (2);
+	}
+	if (flags.h == 1){
+		help();
+		return (0);
 	}
 
 	/* main ping loop starts here */
@@ -42,7 +45,6 @@ int main(int argc, char ** argv)
 		return 1;
 	}
 
-
 	// set timout for recv function
 	struct timeval time_out;
 	int RECV_TIMEOUT = 1;
@@ -56,16 +58,14 @@ int main(int argc, char ** argv)
 		return (1);
 	}
 
-
 	signal(SIGINT, intHandler);
 
 	t_msg msg;
 
 	clock_gettime(CLOCK_MONOTONIC, &time_from_start);
-	ping(sockfd, destination, &pingloop, &msg);
+	ping(sockfd, destination, &pingloop, &msg, &flags);
 	clock_gettime(CLOCK_MONOTONIC, &time_from_end);
 	
-	msg.total_sent -= 1;
 	// calculate the time it took to run the ping.
 	double timeElapsed = ((double)(time_from_end.tv_nsec 
 							- time_from_start.tv_nsec)) / 1000000.0;
@@ -76,9 +76,6 @@ int main(int argc, char ** argv)
 	printf("\n%d packets sent, %d packets received, %f percent packet loss. Total time: %f ms.\n\n",
 				msg.total_sent, msg.received, ((msg.total_sent - msg.received) / msg.total_sent)*100.0, total_msec);
 
-
-
 	return (0);
 
 }
-
