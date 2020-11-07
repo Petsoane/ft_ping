@@ -26,6 +26,8 @@ int init(int argc, char **argv, FT_FLAGS *flags, t_destination *dest)
     char *tmp;
     char *out;
 
+    out = NULL;
+
     for (; i < argc; i++){
         tmp = ft_strtrim(argv[i]);
 
@@ -38,6 +40,10 @@ int init(int argc, char **argv, FT_FLAGS *flags, t_destination *dest)
             free(tmp);
         }
         else {
+            if (out != NULL){
+                help();
+                return -1;
+            }
             out = tmp;
         }
     }
