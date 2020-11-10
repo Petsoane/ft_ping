@@ -29,7 +29,10 @@ int main(int argc, char ** argv)
 		help();
 		return (0);
 	}
-
+	if (flags.v == 1 && argc < 3){
+		usage("./ft_ping");
+		return (1);
+	}
 
 	/* main ping loop starts here */
 	// open a raw socket connection.
