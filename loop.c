@@ -34,10 +34,9 @@ void ping(int sockfd, t_destination dest, int *pingloop, t_msg *msg, FT_FLAGS *f
         clock_gettime(CLOCK_MONOTONIC, &start);
         struct sockaddr *tmp = dest.info->ai_addr;
         sstatus = sendto(sockfd, &pkt, sizeof(pkt), 0, tmp, sizeof(*tmp));
-        if (sstatus <= 0){
+        if (sstatus <= 0)
             // fprintf(stderr, "\nPacket sending failed: %d - %s \n", sstatus, gai_strerror(sstatus));
             flag = 0;
-        }
 
         // recieve pkt.
         struct sockaddr_in r_addr;
@@ -62,7 +61,7 @@ void ping(int sockfd, t_destination dest, int *pingloop, t_msg *msg, FT_FLAGS *f
                                 64, dest.info->ai_canonname, dest.ipstr, msg_count, 64, rtt_msec);
                 }
                 else {
-                    printf("%d bytes from %s (%s): icmp_seq=%d ttl=%d rtt=%f ms\n",
+                    printf("%d bytes from %s (%s): icmp_seq=%d ttl=%d rtt=%Lf ms\n",
                                 64, dest.fqdn, dest.ipstr, msg_count, 64, rtt_msec);
                     msg_recv++;
                 }

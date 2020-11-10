@@ -13,6 +13,7 @@ void intHandler(int dummy){
 int main(int argc, char ** argv)
 {
 	t_destination 	destination;
+	t_msg 			msg;
 	int 			param_count;
 	FT_FLAGS 		flags;
 	char			ipstr[INET6_ADDRSTRLEN];
@@ -24,10 +25,12 @@ int main(int argc, char ** argv)
 	if (init(argc, argv, &flags, &destination) != 0){
 		return (2);
 	}
+	puts("are you ere");
 	if (flags.h == 1){
 		help();
 		return (0);
 	}
+
 
 	/* main ping loop starts here */
 	// open a raw socket connection.
@@ -58,10 +61,10 @@ int main(int argc, char ** argv)
 		return (1);
 	}
 
+	// Set the signal interrupt handler.
 	signal(SIGINT, intHandler);
 
-	t_msg msg;
-
+	// clock the current time, ping and clock the closing time.
 	clock_gettime(CLOCK_MONOTONIC, &time_from_start);
 	ping(sockfd, destination, &pingloop, &msg, &flags);
 	clock_gettime(CLOCK_MONOTONIC, &time_from_end);
@@ -69,10 +72,11 @@ int main(int argc, char ** argv)
 	// calculate the time it took to run the ping.
 	double timeElapsed = ((double)(time_from_end.tv_nsec 
 							- time_from_start.tv_nsec)) / 1000000.0;
-
 	double total_msec = 0;
 	total_msec = (time_from_end.tv_sec - time_from_start.tv_sec) * 1000.0 + timeElapsed;
-	printf("\n ===%s ping statistics===\n", destination.info->ai_canonname);
+
+	// Print the statistics for the ping..
+	printf("\n===%s ping statistics===\n", destination.info->ai_canonname);
 	printf("\n%d packets sent, %d packets received, %f percent packet loss. Total time: %f ms.\n\n",
 				msg.total_sent, msg.received, ((msg.total_sent - msg.received) / msg.total_sent)*100.0, total_msec);
 
