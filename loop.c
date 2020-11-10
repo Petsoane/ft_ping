@@ -61,7 +61,7 @@ void ping(int sockfd, t_destination dest, int *pingloop, t_msg *msg, FT_FLAGS *f
                                 64, dest.info->ai_canonname, dest.ipstr, msg_count, 64, rtt_msec);
                 }
                 else {
-                    printf("%d bytes from %s (%s): icmp_seq=%d ttl=%d rtt=%Lf ms\n",
+                    printf("%d bytes from %s (%s): icmp_seq=%d ttl=%d rtt=%.3Lf ms\n",
                                 64, dest.fqdn, dest.ipstr, msg_count, 64, rtt_msec);
                     msg_recv++;
                 }

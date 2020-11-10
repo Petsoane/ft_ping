@@ -67,7 +67,6 @@ int init(int argc, char **argv, FT_FLAGS *flags, t_destination *dest)
     struct sockaddr_in *ipv4 = (struct sockaddr_in *)dest->info->ai_addr;
     void *addr = &(ipv4->sin_addr);
     inet_ntop(dest->info->ai_family, addr, dest->ipstr, sizeof(dest->ipstr));
-    puts("are you ere");
 
     dest->fqdn = reverse_dns_lookup(dest->ipstr);
     return 0;

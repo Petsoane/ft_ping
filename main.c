@@ -25,7 +25,6 @@ int main(int argc, char ** argv)
 	if (init(argc, argv, &flags, &destination) != 0){
 		return (2);
 	}
-	puts("are you ere");
 	if (flags.h == 1){
 		help();
 		return (0);
@@ -77,7 +76,7 @@ int main(int argc, char ** argv)
 
 	// Print the statistics for the ping..
 	printf("\n===%s ping statistics===\n", destination.info->ai_canonname);
-	printf("\n%d packets sent, %d packets received, %f percent packet loss. Total time: %f ms.\n\n",
+	printf("\n%d packets sent, %d packets received, %.3f percent packet loss. Total time: %.3f ms.\n\n",
 				msg.total_sent, msg.received, ((msg.total_sent - msg.received) / msg.total_sent)*100.0, total_msec);
 
 	return (0);
