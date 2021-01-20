@@ -21,6 +21,10 @@ int main(int argc, char ** argv)
 
 	struct ping_pkt	pkt;
 
+	if (argc < 2){
+		usage("./ft_ping");
+		return (0);
+	}
 	// init program start.
 	if (init(argc, argv, &flags, &destination) != 0){
 		return (2);
@@ -70,9 +74,9 @@ int main(int argc, char ** argv)
 	clock_gettime(CLOCK_MONOTONIC, &time_from_start);
 	ping(sockfd, destination, &pingloop, &msg, &flags);
 	clock_gettime(CLOCK_MONOTONIC, &time_from_end);
-	
+
 	// calculate the time it took to run the ping.
-	double timeElapsed = ((double)(time_from_end.tv_nsec 
+	double timeElapsed = ((double)(time_from_end.tv_nsec
 							- time_from_start.tv_nsec)) / 1000000.0;
 	double total_msec = 0;
 	total_msec = (time_from_end.tv_sec - time_from_start.tv_sec) * 1000.0 + timeElapsed;
